@@ -32,14 +32,33 @@ app.get("/api/1451001600000", function (req, res) {
 });
 
 // Add this route to handle invalid date strings
+// app.get("/api/:date", function (req, res) {
+//   const inputDate = new Date(req.params.date);
+//   if (isNaN(inputDate.getTime())) {
+//     res.json({ error: "Invalid Date" });
+//   } else {
+//     // Continue with the logic for valid dates
+//     res.json({ unix: inputDate.getTime(), utc: inputDate.toUTCString() });
+//   }
+// });
+
 app.get("/api/:date", function (req, res) {
-  const inputDate = new Date(req.params.date);
-  if (isNaN(inputDate.getTime())) {
-    res.json({ error: "Invalid Date" });
+  let dateString = req.params.date;
+
+  if (/\d{5,}/.test(dateString)) {
+    let dateInt = parseInt(dateString);
+
+    res.json({ unix: dateString, utc: new Date(dateInt).toUTCString() });
   } else {
-    // Continue with the logic for valid dates
-    res.json({ unix: inputDate.getTime(), utc: inputDate.toUTCString() });
+    let dateObject = new Date(dateString);
+
+    if (dateObject.toString() === "Invalid Date") {
+      res.json({ error: "Invalid Date" });
+    } else {
+      res.json({ unix: dateObject.valueOf(), utc: dateObject.toUTCString() });
+    }
   }
+
 });
 
 // Add this route to handle empty date parameter
