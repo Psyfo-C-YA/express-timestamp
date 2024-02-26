@@ -31,23 +31,15 @@ app.get("/api/1451001600000", function (req, res) {
   res.json({ unix: 1451001600000, utc: "Fri, 25 Dec 2015 00:00:00 GMT" });
 });
 
-// Add this route to handle invalid date strings
-// app.get("/api/:date", function (req, res) {
-//   const inputDate = new Date(req.params.date);
-//   if (isNaN(inputDate.getTime())) {
-//     res.json({ error: "Invalid Date" });
-//   } else {
-//     // Continue with the logic for valid dates
-//     res.json({ unix: inputDate.getTime(), utc: inputDate.toUTCString() });
-//   }
-// });
 
-app.get("/api/:date", function (req, res) {
-  let dateString = req.params.date;
+app.get("/api/timestamp/:date_string", (req, res) => {
+  let dateString = req.params.date_string;
 
+  //A 4 digit number is a valid ISO-8601 for the beginning of that year
+  //5 digits or more must be a unix time, until we reach a year 10,000 problem
   if (/\d{5,}/.test(dateString)) {
     let dateInt = parseInt(dateString);
-
+    //Date regards numbers as unix timestamps, strings are processed differently
     res.json({ unix: dateString, utc: new Date(dateInt).toUTCString() });
   } else {
     let dateObject = new Date(dateString);
@@ -58,8 +50,27 @@ app.get("/api/:date", function (req, res) {
       res.json({ unix: dateObject.valueOf(), utc: dateObject.toUTCString() });
     }
   }
-
 });
+
+
+// app.get("/api/:date", function (req, res) {
+//   let dateString = req.params.date;
+
+//   if (/\d{5,}/.test(dateString)) {
+//     let dateInt = parseInt(dateString);
+
+//     res.json({ unix: dateString, utc: new Date(dateInt).toUTCString() });
+//   } else {
+//     let dateObject = new Date(dateString);
+
+//     if (dateObject.toString() === "Invalid Date") {
+//       res.json({ error: "Invalid Date" });
+//     } else {
+//       res.json({ unix: dateObject.valueOf(), utc: dateObject.toUTCString() });
+//     }
+//   }
+
+// });
 
 // Add this route to handle empty date parameter
 app.get("/api", function (req, res) {
